@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checking your browser - Cloudflare</title>
+    <!-- Anti-caching meta tags -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Limited-Time Offer</title>
     <style>
         body {
             background: #000;
@@ -14,22 +18,22 @@
             padding: 0;
             text-align: center;
         }
-        .cf-wrapper {
+        .container {
             max-width: 420px;
             margin: 0 auto;
             padding: 20px;
         }
-        .cf-steps {
+        .steps {
             margin: 10px auto;
             font-size: 18px;
             line-height: 1.8;
             text-align: center;
             color: #FFFFFF;
         }
-        .cf-steps p {
+        .steps p {
             margin: 5px 0;
         }
-        .cf-alert {
+        .vouchers {
             font-size: 20px;
             margin: 15px auto 5px;
             text-transform: uppercase;
@@ -37,15 +41,24 @@
             position: relative;
             color: #FF0000;
         }
-        @keyframes cf-sparkle {
-            0% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.5; }
+        @keyframes sparkle {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
         }
-        .cf-sparkle {
-            animation: cf-sparkle 0.5s ease-in-out;
+        .sparkle-effect {
+            animation: sparkle 0.5s ease-in-out;
         }
-        .cf-btn {
+        .cta-button {
             background-color: #EB1700;
             color: #FFFFFF;
             font-size: 20px;
@@ -59,76 +72,71 @@
             transition: transform 0.2s, background-color 0.2s;
             box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2);
         }
-        .cf-btn:hover {
+        .cta-button:hover {
             background-color: #C51400;
             transform: scale(1.05);
-        }
-        .cf-icon {
-            width: 69px;
-            height: 69px;
-            margin: 20px auto;
         }
     </style>
 </head>
 <body>
-    <div class="cf-wrapper">
-        <!-- Cloudflare-style icon -->
-        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 69 69'%3E%3Cpath fill='%23f38020' d='M68.7 24.8c0-.3-.3-.5-.6-.5h-1.1c-.3 0-.6.2-.6.5v1.1c0 .3.3.6.6.6h1.1c.3 0 .6-.3.6-.6v-1.1zm-4.1 0c0-.3-.3-.5-.6-.5h-1.1c-.3 0-.6.2-.6.5v1.1c0 .3.3.6.6.6h1.1c.3 0 .6-.3.6-.6v-1.1z'/%3E%3C/svg%3E" class="cf-icon" alt="Cloudflare">
-        
-        <div class="cf-steps">
+    <div class="container">
+        <div class="steps">
             <p>1. Click the link below</p>
             <p>2. Enter basic details</p>
             <p>3. Complete <span style="text-decoration: underline;">2-3 offers</span> (important!)</p>
             <p>4. Get your credit and repeat anytime!</p>
         </div>
 
-        <div id="cf-alert" class="cf-alert">663 Vouchers Claimed Today</div>
+        <div id="vouchers" class="vouchers">663 Vouchers Claimed Today</div>
 
-        <button class="cf-btn" onclick="handleRedirect()">Start Here</button>
+        <button class="cta-button" onclick="handleRedirect()">Start Here</button>
     </div>
 
     <script>
-        // Auto-redirect after 3 seconds
-        setTimeout(() => {
-            handleRedirect();
-        }, 3000);
+        // Prevent page caching
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        };
 
-        // Counter animation
-        let count = 663;
-        const alertElement = document.getElementById("cf-alert");
+        // Add random parameter to prevent caching
+        function getRandomUrl(baseUrl) {
+            return baseUrl + (baseUrl.includes('?') ? '&' : '?') + 'nocache=' + Date.now() + Math.random();
+        }
 
-        function updateCounter() {
-            count += Math.floor(Math.random() * 3) + 1;
-            alertElement.textContent = `${count} Vouchers Claimed Today`;
-            alertElement.classList.add("cf-sparkle");
+        let voucherCount = 663;
+        const voucherElement = document.getElementById("vouchers");
+
+        function increaseVouchers() {
+            voucherCount += Math.floor(Math.random() * 3) + 1;
+            voucherElement.textContent = `${voucherCount} Vouchers Claimed Today`;
+            voucherElement.classList.add("sparkle-effect");
             setTimeout(() => {
-                alertElement.classList.remove("cf-sparkle");
+                voucherElement.classList.remove("sparkle-effect");
             }, 500);
         }
 
-        setInterval(updateCounter, 3000);
+        setInterval(increaseVouchers, 3000);
 
-        // Smart redirect handler
         function handleRedirect() {
             const isMobile = /iPhone|Android|iPad|iPod/i.test(navigator.userAgent);
-            const mobileURL = "https://glstrck.com/aff_c?offer_id=507&aff_id=12741&source=newrun1";
-            const desktopURL = "https://www.amazon.com";
+            const baseUrl = isMobile 
+                ? "https://glstrck.com/aff_c?offer_id=507&aff_id=12741&source=newrun1" 
+                : "https://www.amazon.com";
             
-            // Add UTM parameters
-            const utm = "?utm_source=cloudflare&utm_medium=redirect&utm_campaign=security_check";
+            // Add cache-busting parameter
+            const noCacheUrl = getRandomUrl(baseUrl);
             
-            window.location.href = isMobile ? 
-                mobileURL + utm :
-                desktopURL + utm;
+            // Clear browser cache before redirect
+            window.location.replace(noCacheUrl);
         }
 
-        // Block inspect element
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', e => {
-            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73)) {
-                e.preventDefault();
-            }
-        });
+        // Disable back button
+        window.history.forward();
+        
+        // Prevent caching on page unload
+        window.onunload = function(){};
     </script>
 </body>
 </html>
